@@ -1,0 +1,7 @@
+{
+    "name": "tracker-api-old",
+    "version": "0.0.0",
+    "scripts": {
+        "dev": "python run.py"
+    }
+}
