@@ -24,7 +24,7 @@ export default function Layout({
             <SideNav />
           </div>
         </ResizablePanel>
-        <ResizablePanel defaultSize={100}>
+        <ResizablePanel defaultSize={85}>
           <ResizablePanelGroup direction="vertical" className="w-full h-full">
             <ResizablePanel defaultSize={100} className="!overflow-y-auto">
               <div className="flex w-100 h-100 py-4 px-4">
