@@ -123,3 +123,17 @@ export async function InternalGetEventCount(siteId: string, userId: string) {
     //? Add other table counts, eg custom events or make an events table and count there (RESET EVERY MONTH)
     return await InternalCountPageViews(siteId, userId);
 }
+
+export async function InternalGetBounceRate(siteId: string, userId: string) {
+    const [data] = await db
+        .selectDistinct({
+            bounceRate: count(siteSession.id)
+        })
+        .from(siteSession)
+        .leftJoin(site, and(eq(site.id, siteId), eq(site.userId, userId)))
+        .leftJoin(pageView, eq(pageView.sessionId, siteSession.id))
+        .groupBy(siteSession.id)
+        .having(eq(count(pageView.id), 1))
+
+    return data;
+}

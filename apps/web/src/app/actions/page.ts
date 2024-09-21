@@ -1,7 +1,7 @@
 "use server"
 
 import { auth } from '../../../auth';
-import { InternalCountPageViews, InternalGetEventCount, InternalGetPageSources, InternalGetPageView, InternalGetPageViews } from '../../db/queries';
+import { InternalCountPageViews, InternalGetBounceRate, InternalGetEventCount, InternalGetPageSources, InternalGetPageView, InternalGetPageViews } from '../../db/queries';
 
 
 export async function GetPageViews(siteId: string) {
@@ -59,5 +59,14 @@ export async function GetEventCount(siteId: string) {
     const userId = session?.user?.id ?? ""
 
     return await InternalGetEventCount(siteId, userId);
+}
 
+export async function GetBounceRate(siteId: string) {
+    const session = await auth();
+
+    if (!session)
+        throw (401)
+
+    const userId = session?.user?.id ?? ""
+    return await InternalGetBounceRate(siteId, userId);
 }

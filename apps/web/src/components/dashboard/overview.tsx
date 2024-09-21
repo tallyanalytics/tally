@@ -3,13 +3,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card";
 import { Skeleton } from "@repo/ui/skeleton";
 import useSWR from "swr";
-import { CountPageViews } from "../../app/actions/page";
+import { CountPageViews, GetBounceRate } from "../../app/actions/page";
 import { CountSessions } from "../../app/actions/session";
-
-
-
-
-
 
 export default function Overview({ params }: { params: { slug: string } }) {
     let countViews: number | undefined;
@@ -34,6 +29,16 @@ export default function Overview({ params }: { params: { slug: string } }) {
         const totalSessions = data?.[0]?.total ?? 0;
 
         return (countViews / totalSessions).toFixed(2);
+    }
+
+    function getBounceRate(slug: string) {
+        const { data, error, isLoading } = useSWR(`/bounce/count/${slug}`, async () => await GetBounceRate(slug));
+
+        if (isLoading || !countViews) return <Skeleton className="h-5 w-[150px]" />
+
+        const bouncedSessions = data?.bounceRate ?? 0;
+
+        return (bouncedSessions / countViews).toFixed(2);
     }
 
     return (
@@ -67,7 +72,7 @@ export default function Overview({ params }: { params: { slug: string } }) {
                     Bounce Rate
                 </CardTitle>
                 <div className="text-2xl text-muted-foreground">
-                    10,000
+                    {getBounceRate(params.slug)}
                 </div>
             </CardHeader>
         </Card >
