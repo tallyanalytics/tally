@@ -10,16 +10,19 @@ export default async function Navbar() {
         <div className="w-100 flex flex-row justify-between py-4 px-2">
             <div className="flex-col">
                 <Link href="/" className={buttonVariants({ variant: "ghost" })}>
-                    MyApp
+                    Tally
                 </Link>
             </div>
             <div className="flex-row flex">
-                <Link href="/pricing" className={buttonVariants({ variant: "ghost" })}>
+                <Link href="#pricing" className={buttonVariants({ variant: "ghost" })}>
                     Pricing
                 </Link>
-                <Link href="/docs" className={buttonVariants({ variant: "ghost" })}>
-                    Docs
+                <Link href="#features" className={buttonVariants({ variant: "ghost" })}>
+                    Features
                 </Link>
+                {/* <Link href="/docs" className={buttonVariants({ variant: "ghost" })}>
+                    Docs
+                </Link> */}
                 <Link href="/about" className={buttonVariants({ variant: "ghost" })}>
                     About
                 </Link>

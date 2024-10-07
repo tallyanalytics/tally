@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@repo/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@repo/ui/chart";
+import { DateRange } from "react-day-picker";
 import { Area, AreaChart, CartesianGrid, LabelList, Line, LineChart, XAxis, YAxis } from "recharts";
 
 
@@ -32,6 +33,7 @@ const visitors = [
     { date: "2022-01-24", views: 0 },
     { date: "2022-01-25", views: 0 },
 ]
+
 const chartConfig = {
     views: {
         label: "views",
@@ -39,7 +41,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export default function UniqueViews({ params }: { params: { slug: string } }) {
+export default function UniqueViews({ params, filter }: { params: { slug: string }, filter: DateRange | undefined }) {
     return (
         <Card className="rounded-3xl shadow">
             <CardHeader>

@@ -1,6 +1,7 @@
 "use client"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
+import { Card, CardHeader, CardTitle } from "@repo/ui/card";
 import { SessionProvider, useSession } from "next-auth/react";
 import useSWR from "swr";
 import AddSiteButton from "../../components/dashboard/addSiteButton";
@@ -22,9 +23,16 @@ export default function Page(): JSX.Element {
     )
 }
 
-function DashboardSiteCard() {
+function DashboardSiteCard(domain: string) {
     return (
-        <div></div>
+        <Card>
+            <CardHeader>
+                <CardTitle>{domain}</CardTitle>
+            </CardHeader>
+            <div>
+                <div></div>
+            </div>
+        </Card>
     )
 
 }

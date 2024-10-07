@@ -31,11 +31,58 @@ import Visitors from "../../../components/dashboard/visitors";
 
 
 export default function Page({ params }: { params: { slug: string } }): JSX.Element {
-  console.log(params.slug)
   const [dateFilter, setDateFilter] = useState<DateRange | undefined>({
-    from: new Date(),
-    to: new Date(),
+    from: subtractFromCurrentDate({ hours: 1 }),
   })
+
+  function subtractFromCurrentDate({ hours = 0, days = 0, months = 0, years = 0 }) {
+    const currentDate = new Date();
+
+    if (hours) {
+      currentDate.setHours(currentDate.getHours() - hours);
+    }
+    if (days) {
+      currentDate.setDate(currentDate.getDate() - days);
+    }
+    if (months) {
+      currentDate.setMonth(currentDate.getMonth() - months);
+    }
+    if (years) {
+      currentDate.setFullYear(currentDate.getFullYear() - years);
+    }
+
+    return currentDate;
+  }
+
+  function selectOnChange(value: string) {
+    let newDate: Date;
+
+    switch (value) {
+      case "lastHour": // Last hour
+        newDate = subtractFromCurrentDate({ hours: 1 });
+        break;
+      case "lastDay": // Last day (24 hours)
+        newDate = subtractFromCurrentDate({ hours: 24 });
+        break;
+      case "lastWeek": // Last week (7 days)
+        newDate = subtractFromCurrentDate({ days: 7 });
+        break;
+      case "lastMonth": // Last month
+        newDate = subtractFromCurrentDate({ months: 1 });
+        break;
+      case "last6Months": // Last month
+        newDate = subtractFromCurrentDate({ months: 6 });
+        break;
+      case "lastYear": // Last year
+        newDate = subtractFromCurrentDate({ years: 1 });
+        break;
+      default:
+        newDate = new Date(); // Default to the current date if no match
+    }
+
+    console.log(newDate);
+    setDateFilter({ from: newDate, to: undefined })
+  }
 
   return (
     <main className="w-full grid grid-cols-2 gap-6">
@@ -45,21 +92,22 @@ export default function Page({ params }: { params: { slug: string } }): JSX.Elem
         </SessionProvider>
       </div>
       <div className="col-span-2">
-        <Select>
+        <Select onValueChange={selectOnChange} defaultValue="lastHour">
           <SelectTrigger className="w-[150px] float-end">
             <SelectValue placeholder="Select time" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="apple">Last hour</SelectItem>
-              <SelectItem value="banana">Last day</SelectItem>
-              <SelectItem value="blueberry">Last week</SelectItem>
-              <SelectItem value="grapes">Last month</SelectItem>
-              <SelectItem value="pineapple">Last year</SelectItem>
+              <SelectItem value="lastHour">Last hour</SelectItem>
+              <SelectItem value="lastDay">Last day</SelectItem>
+              <SelectItem value="lastWeek">Last week</SelectItem>
+              <SelectItem value="lastMonth">Last month</SelectItem>
+              <SelectItem value="last6Months">Last 6 months</SelectItem>
+              <SelectItem value="lastYear">Last year</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
-        <Popover>
+        {/* <Popover>
           <PopoverTrigger asChild>
             <Button
               variant={"outline"}
@@ -89,30 +137,30 @@ export default function Page({ params }: { params: { slug: string } }): JSX.Elem
               selected={dateFilter}
               onSelect={setDateFilter}
               disabled={(date: Date) =>
-                date > new Date() || date < new Date("1900-01-01")
+                date > new Date() || date < new Date("2024-01-01")
               }
               initialFocus
             />
           </PopoverContent>
-        </Popover>
+        </Popover> */}
       </div>
       <div className="col-span-2">
-        <Overview params={params} />
+        <Overview params={params} filter={dateFilter} />
       </div>
       <div className="col-span-2">
-        <UniqueViews params={params} />
+        <UniqueViews params={params} filter={dateFilter} />
       </div>
       <div className="col-span-2 lg:col-span-1">
-        <Pages params={params} />
+        <Pages params={params} filter={dateFilter} />
       </div>
       <div className="col-span-2 lg:col-span-1">
-        <Sources params={params} />
+        <Sources params={params} filter={dateFilter} />
       </div>
       <div className="col-span-2 lg:col-span-1">
-        <Visitors params={params} />
+        <Visitors params={params} filter={dateFilter} />
       </div>
       <div className="col-span-2 lg:col-span-1">
-        <Sessions params={params} />
+        <Sessions params={params} filter={dateFilter} />
       </div>
     </main >
   );

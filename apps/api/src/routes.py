@@ -51,7 +51,7 @@ class Event(BaseModel):
 
 
 @router.post("/t", status_code=status.HTTP_200_OK)
-def track_event(
+def track_event(  # noqa: C901
     request: Request,
     event: Event,
     user_agent: Annotated[str | None, Header()] = None,
@@ -62,6 +62,13 @@ def track_event(
         site = get_site_token(event.token)
     else:
         site = get_site_domain(domain)
+
+    if "https://" in domain:
+        site = site.replace("https://", "")
+    if "www." in site:
+        site = site.replace("www.", "")
+    if site.endsWith("/"):
+        site = site.replace("/", "")
 
     ip = request.client.host
 

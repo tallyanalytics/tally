@@ -65,7 +65,7 @@
   .card{
     @apply rounded-xl
   }
-  button{
+  /* button{
     @apply transform transition-transform duration-200 active:scale-90
-  }
+  } */
 }

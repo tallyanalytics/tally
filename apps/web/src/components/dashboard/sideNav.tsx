@@ -33,19 +33,26 @@ function Menu() {
 
     return (
         <div>
-            <Button variant="ghost" className="flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline">
-                <Avatar className="h-5 w-5 mr-2">
-                    {
-                        session?.data?.user?.image ?
-                            <AvatarImage src={session?.data?.user?.image} alt="User profile image" />
-                            :
-                            <AvatarFallback>{session?.data?.user?.name?.charAt(0)}</AvatarFallback>
-                    }
-                </Avatar>
+            <div className="flex">
+                <Button variant="ghost" className="flex items-centerflex-1 w-full justify-start py-4 text-sm font-medium transition-all hover:underline">
+                    <div>
+                        <Avatar className="h-5 w-5 mr-2">
+                            {
+                                session?.data?.user?.image ?
+                                    <AvatarImage src={session?.data?.user?.image} alt="User profile image" />
+                                    :
+                                    <AvatarFallback>{session?.data?.user?.name?.charAt(0)}</AvatarFallback>
+                            }
+                        </Avatar>
+                    </div>
+                    <div className="">
+                        {session?.data?.user?.name}
+                    </div>
+                </Button>
                 <div>
-                    {session?.data?.user?.name}
+                    <ModeToggle />
                 </div>
-            </Button>
+            </div>
             <Separator className="my-4 border" />
             <Link
                 href="/dashboard"
@@ -53,7 +60,7 @@ function Menu() {
                     buttonVariants({
                         variant: "ghost",
                     }),
-                    "justify-start w-full",
+                    "justify-start flex items-center w-full",
                     pathname === "/dashboard" && "text-primary"
                 )}
             ><DashboardIcon className="mr-2 h-4 w-4" /> Dashboard
@@ -162,9 +169,6 @@ export default function SideNav() {
                 </div>
             </nav >
             <div>
-                <div className="py-2">
-                    <ModeToggle />
-                </div>
                 <EventUsage />
             </div>
         </div >

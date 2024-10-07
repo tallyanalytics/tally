@@ -1,44 +1,76 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card";
+import { Card, CardHeader, CardTitle } from "@repo/ui/card";
 import { Skeleton } from "@repo/ui/skeleton";
+import { useEffect } from "react";
+import { DateRange } from "react-day-picker";
 import useSWR from "swr";
-import { CountPageViews, GetBounceRate } from "../../app/actions/page";
+import { CountPageViews, GetBounceRate, GetVisitDuration } from "../../app/actions/page";
 import { CountSessions } from "../../app/actions/session";
 
-export default function Overview({ params }: { params: { slug: string } }) {
+export default function Overview({ params, filter }: { params: { slug: string }, filter: DateRange | undefined }) {
     let countViews: number | undefined;
 
     function getTotalPageViews(slug: string) {
-        const { data, error, isLoading } = useSWR(`/views/count/${slug}`, async () => await CountPageViews(slug));
+        const { data, error, isLoading, mutate } = useSWR(`/views/count/${slug}`, async () => await CountPageViews(slug, filter));
+
+        useEffect(() => {
+            mutate();
+        }, [filter])
 
         if (isLoading) return <Skeleton className="h-5 w-[150px]" />
 
         const totalViews = data?.[0]?.total ?? 0
 
         countViews = totalViews
-
         return totalViews
     }
 
     function getTotalSessions(slug: string) {
-        const { data, error, isLoading } = useSWR(`/sessions/count/${slug}`, async () => await CountSessions(slug));
+        const { data, error, isLoading, mutate } = useSWR(`/sessions/count/${slug}`, async () => await CountSessions(slug, filter));
 
-        if (isLoading || !countViews) return <Skeleton className="h-5 w-[150px]" />
+        useEffect(() => {
+            mutate();
+        }, [filter, countViews])
+
+        if (isLoading) return <Skeleton className="h-5 w-[150px]" />
+
 
         const totalSessions = data?.[0]?.total ?? 0;
+        if (totalSessions === 0 || countViews === 0 || !countViews)
+            return 0
 
         return (countViews / totalSessions).toFixed(2);
     }
 
     function getBounceRate(slug: string) {
-        const { data, error, isLoading } = useSWR(`/bounce/count/${slug}`, async () => await GetBounceRate(slug));
+        const { data, error, isLoading, mutate } = useSWR(`/bounce/count/${slug}`, async () => await GetBounceRate(slug, filter));
 
-        if (isLoading || !countViews) return <Skeleton className="h-5 w-[150px]" />
+        useEffect(() => {
+            mutate();
+        }, [filter])
+
+        if (isLoading) return <Skeleton className="h-5 w-[150px]" />
 
         const bouncedSessions = data?.bounceRate ?? 0;
+        if (bouncedSessions === 0 || countViews === 0 || !countViews)
+            return 0
 
         return (bouncedSessions / countViews).toFixed(2);
+    }
+
+    function getVisitDuration(slug: string) {
+        const { data, error, isLoading, mutate } = useSWR(`/visit/duration/${slug}`, async () => await GetVisitDuration(slug, filter));
+
+        useEffect(() => {
+            mutate();
+        }, [filter])
+
+        if (isLoading) return <Skeleton className="h-5 w-[150px]" />
+
+        const visitDuration = data?.averageDuration ?? 0;
+
+        return visitDuration;
     }
 
     return (
@@ -53,7 +85,7 @@ export default function Overview({ params }: { params: { slug: string } }) {
             </CardHeader>
             <CardHeader>
                 <CardTitle className="text-xs">
-                    Views Per Visit
+                    Average Views Per Session
                 </CardTitle>
                 <div className="text-2xl text-muted-foreground">
                     {getTotalSessions(params.slug)}
@@ -64,7 +96,7 @@ export default function Overview({ params }: { params: { slug: string } }) {
                     Visit Duration
                 </CardTitle>
                 <div className="text-2xl text-muted-foreground">
-                    10,000
+                    {getVisitDuration(params.slug)}
                 </div>
             </CardHeader>
             <CardHeader>

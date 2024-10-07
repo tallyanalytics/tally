@@ -32,7 +32,8 @@
     "./form": "./src/components/ui/form.tsx",
     "./progress": "./src/components/ui/progress.tsx",
     "./separator": "./src/components/ui/separator.tsx",
-    "./skeleton": "./src/components/ui/skeleton.tsx"
+    "./skeleton": "./src/components/ui/skeleton.tsx",
+    "./slider": "./src/components/ui/slider.tsx"
   },
   "license": "MIT",
   "scripts": {
@@ -69,6 +70,7 @@
     "@radix-ui/react-scroll-area": "^1.1.0",
     "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slider": "^1.2.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
     "class-variance-authority": "^0.7.0",

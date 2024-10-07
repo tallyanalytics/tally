@@ -14,6 +14,7 @@ import {
 } from "@repo/ui/chart";
 import { ScrollArea } from "@repo/ui/scroll-area";
 import { useEffect, useState } from "react";
+import { DateRange } from "react-day-picker";
 import { Bar, BarChart, CartesianGrid, Rectangle, XAxis, YAxis } from "recharts";
 import useSWR from "swr";
 import { GetPageSources } from "../../app/actions/page";
@@ -28,8 +29,12 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export default function Sources({ params }: { params: { slug: string } }) {
-    const { data, error, isLoading } = useSWR(`/page/sources/${params.slug}`, async () => await GetPageSources(params.slug));
+export default function Sources({ params, filter }: { params: { slug: string }, filter: DateRange | undefined }) {
+    const { data, error, isLoading, mutate } = useSWR(`/page/sources/${params.slug}`, async () => await GetPageSources(params.slug, filter));
+
+    useEffect(() => {
+        mutate();
+    }, [filter]);
 
     return (
         <Card className="rounded-3xl shadow">

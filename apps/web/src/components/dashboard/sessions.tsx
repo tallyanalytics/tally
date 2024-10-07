@@ -15,7 +15,9 @@ import {
     TableHeader,
     TableRow,
 } from "@repo/ui/table";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { DateRange } from "react-day-picker";
+import useSWR from "swr";
 import { GetRecentSessions } from "../../app/actions/session";
 
 interface Session {
@@ -28,16 +30,12 @@ interface Session {
     views: number;
 }
 
-export default function Sessions({ params }: { params: { slug: string } }) {
-    const [sessions, setSessions] = useState<Session[]>([]);
+export default function Sessions({ params, filter }: { params: { slug: string }, filter: DateRange | undefined }) {
+    const { data, error, isLoading, mutate } = useSWR(`/visitors/${params.slug}`, async () => await GetRecentSessions(params.slug, filter));
 
     useEffect(() => {
-        async function call() {
-            const response = await GetRecentSessions(params.slug);
-            setSessions(response);
-        }
-        call();
-    }, [])
+        mutate();
+    }, [filter]);
 
     return (
         <Card className="rounded-3xl shadow">
@@ -55,11 +53,11 @@ export default function Sessions({ params }: { params: { slug: string } }) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {sessions.map((session, index) => (
+                            {data?.map((session, index) => (
                                 <TableRow key={index}>
                                     <TableCell>{session.referrer ?? "Direct/Unknown"}</TableCell>
                                     <TableCell>{session?.views}</TableCell>
-                                    <TableCell>{session?.updatedAt.toLocaleString("en-GB")}</TableCell>
+                                    <TableCell>{session?.updatedAt?.toLocaleString("en-GB")}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

@@ -2,7 +2,6 @@ import {
     boolean,
     char,
     integer,
-    interval,
     pgEnum,
     pgTable,
     primaryKey,
@@ -131,7 +130,7 @@ export const siteSession = pgTable(
         siteId: uuid("siteId").references(() => site.id),
         startedAt: timestamp("startedAt", { mode: "date" }).notNull().defaultNow(),
         updatedAt: timestamp("updatedAt", { mode: "date" }).notNull().defaultNow(),
-        duration: interval("duration")
+        duration: integer("duration").notNull().default(0),
     },
 )
 

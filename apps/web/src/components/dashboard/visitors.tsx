@@ -15,6 +15,8 @@ import {
     TableHeader,
     TableRow,
 } from "@repo/ui/table";
+import { useEffect } from "react";
+import { DateRange } from "react-day-picker";
 import useSWR from "swr";
 import { GetRecentVisitors } from "../../app/actions/visitor";
 
@@ -32,8 +34,12 @@ interface Visitor {
 }
 
 
-export default function Visitors({ params }: { params: { slug: string } }) {
-    const { data, error, isLoading } = useSWR(`/visitors/${params.slug}`, async () => await GetRecentVisitors(params.slug));
+export default function Visitors({ params, filter }: { params: { slug: string }, filter: DateRange | undefined }) {
+    const { data, error, isLoading, mutate } = useSWR(`/visitors/${params.slug}`, async () => await GetRecentVisitors(params.slug, filter));
+
+    useEffect(() => {
+        mutate();
+    }, [filter]);
 
     return (
         <Card className="rounded-3xl shadow">
