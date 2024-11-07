@@ -7,6 +7,7 @@ import {
     CardTitle,
 } from "@repo/ui/card";
 import { ScrollArea } from "@repo/ui/scroll-area";
+import { Skeleton } from "@repo/ui/skeleton";
 import {
     Table,
     TableBody,
@@ -32,19 +33,18 @@ interface Session {
 
 export default function Sessions({ params, filter }: { params: { slug: string }, filter: DateRange | undefined }) {
     const { data, error, isLoading, mutate } = useSWR(`/visitors/${params.slug}`, async () => await GetRecentSessions(params.slug, filter));
-
     useEffect(() => {
         mutate();
     }, [filter]);
 
     return (
-        <Card className="rounded-3xl shadow">
+        <Card className="rounded-3xl shadow-sm">
             <CardHeader>
                 <CardTitle className="font-semibold">Recent Sessions</CardTitle>
             </CardHeader>
             <CardContent>
                 <ScrollArea type="always" className={`min-h-[150px] h-[400px] h-max-[400px]`}>
-                    <Table className="text-left">
+                    {isLoading ? <Skeleton className="h-5 w-full" /> : data && data.length > 0 ? <Table className="text-left">
                         <TableHeader className="sticky">
                             <TableRow>
                                 <TableHead>Referrer</TableHead>
@@ -61,7 +61,7 @@ export default function Sessions({ params, filter }: { params: { slug: string },
                                 </TableRow>
                             ))}
                         </TableBody>
-                    </Table>
+                    </Table> : <div className="text-muted-foreground">No sessions found</div>}
                 </ScrollArea>
             </CardContent>
         </Card >

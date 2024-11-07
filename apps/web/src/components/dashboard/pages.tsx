@@ -13,6 +13,7 @@ import {
     ChartTooltipContent,
 } from "@repo/ui/chart";
 import { ScrollArea } from "@repo/ui/scroll-area";
+import { Skeleton } from "@repo/ui/skeleton";
 import { useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import { Bar, BarChart, CartesianGrid, Rectangle, XAxis, YAxis } from "recharts";
@@ -38,15 +39,15 @@ export default function Pages({ params, filter }: { params: { slug: string }, fi
     }, [filter]);
 
     return (
-        <Card className="rounded-3xl shadow">
+        <Card className="rounded-3xl shadow-sm">
             <CardHeader>
                 <CardTitle>Pages</CardTitle>
             </CardHeader>
             <CardContent>
                 <ScrollArea type="always" className={`min-h-[150px] h-[400px] h-max-[400px]`}>
-                    <ChartContainer
+                    {isLoading ? <Skeleton className="h-5 w-full" /> : data && data.length > 0 ? <ChartContainer
                         style={{
-                            height: data?.length * (35 + (8 || 1)),
+                            height: data.length * (35 + 8),
                             aspectRatio: "auto",
                         }}
                         className="w-full full"
@@ -79,22 +80,19 @@ export default function Pages({ params, filter }: { params: { slug: string }, fi
                                 radius={30}
                                 shape={(shapeProps: any) => (
                                     <>
-                                        {/* Bar */}
                                         <Rectangle {...shapeProps} />
-                                        {/* Name */}
                                         <text x={shapeProps.x + 10} y={shapeProps.y + 22.5} fill="hsl(var(--foreground))">
                                             {shapeProps.page}
                                         </text>
-                                        {/* Value */}
                                         <text x={shapeProps.background.width - 10} y={shapeProps.y + 22.5} textAnchor="end" fill="hsl(var(--foreground))">
-                                            {shapeProps.value.toLocaleString("en")}
+                                            {shapeProps.value?.toLocaleString("en")}
                                         </text>
                                     </>
                                 )}
                             >
                             </Bar>
                         </BarChart>
-                    </ChartContainer>
+                    </ChartContainer> : <div className="text-muted-foreground">No sources found</div>}
                 </ScrollArea>
             </CardContent >
         </Card >

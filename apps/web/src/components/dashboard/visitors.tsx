@@ -7,6 +7,7 @@ import {
     CardTitle,
 } from "@repo/ui/card";
 import { ScrollArea } from "@repo/ui/scroll-area";
+import { Skeleton } from "@repo/ui/skeleton";
 import {
     Table,
     TableBody,
@@ -42,13 +43,13 @@ export default function Visitors({ params, filter }: { params: { slug: string },
     }, [filter]);
 
     return (
-        <Card className="rounded-3xl shadow">
+        <Card className="rounded-3xl shadow-sm">
             <CardHeader>
                 <CardTitle className="font-semibold">Recent Visitors</CardTitle>
             </CardHeader>
             <CardContent>
                 <ScrollArea type="always" className={`min-h-[150px] h-[400px] h-max-[400px]`}>
-                    <Table className="text-left">
+                    {isLoading ? <Skeleton className="h-5 w-full" /> : data && data.length > 0 ? <Table className="text-left">
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Name</TableHead>
@@ -76,7 +77,7 @@ export default function Visitors({ params, filter }: { params: { slug: string },
                                 </TableRow>
                             ))}
                         </TableBody>
-                    </Table>
+                    </Table> : <div className="text-muted-foreground">No visitors found</div>}
                 </ScrollArea>
             </CardContent>
         </Card >
