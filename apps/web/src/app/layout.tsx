@@ -1,6 +1,7 @@
 import "@repo/ui/styles.css";
 import type { Metadata } from "next";
 import { Rubik } from "next/font/google";
+import { SWRConfig } from 'swr';
 import { ThemeProvider } from "../components/theme-provider";
 import "./globals.css";
 

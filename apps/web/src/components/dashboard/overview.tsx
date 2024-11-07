@@ -74,7 +74,7 @@ export default function Overview({ params, filter }: { params: { slug: string },
     }
 
     return (
-        <Card className="grid md:grid-cols-4 grid-cols-2 rounded-3xl shadow">
+        <Card className="grid md:grid-cols-4 grid-cols-2 rounded-3xl shadow-sm">
             <CardHeader className="">
                 <CardTitle className="text-xs">
                     Total Page Views

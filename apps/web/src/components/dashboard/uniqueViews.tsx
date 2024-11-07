@@ -1,49 +1,117 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@repo/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@repo/ui/chart";
+import { differenceInDays, } from 'date-fns';
+import { useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
-import { Area, AreaChart, CartesianGrid, LabelList, Line, LineChart, XAxis, YAxis } from "recharts";
-
-
-const visitors = [
-    { date: "2022-01-01", views: 100 },
-    { date: "2022-01-02", views: 30 },
-    { date: "2022-01-03", views: 12 },
-    { date: "2022-01-04", views: 5 },
-    { date: "2022-01-05", views: 2 },
-    { date: "2022-01-06", views: 1 },
-    { date: "2022-01-07", views: 0 },
-    { date: "2022-01-08", views: 0 },
-    { date: "2022-01-09", views: 0 },
-    { date: "2022-01-10", views: 0 },
-    { date: "2022-01-11", views: 0 },
-    { date: "2022-01-12", views: 0 },
-    { date: "2022-01-13", views: 0 },
-    { date: "2022-01-14", views: 0 },
-    { date: "2022-01-15", views: 0 },
-    { date: "2022-01-16", views: 0 },
-    { date: "2022-01-17", views: 0 },
-    { date: "2022-01-18", views: 0 },
-    { date: "2022-01-19", views: 0 },
-    { date: "2022-01-20", views: 0 },
-    { date: "2022-01-21", views: 0 },
-    { date: "2022-01-22", views: 0 },
-    { date: "2022-01-23", views: 0 },
-    { date: "2022-01-24", views: 0 },
-    { date: "2022-01-25", views: 0 },
-]
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import useSWR from "swr";
+import { GetDailyPageViews } from "../../app/actions/site";
 
 const chartConfig = {
     views: {
         label: "views",
         color: "hsl(var(--primary))",
     },
+    date: {
+        label: "date",
+        color: "hsl(var(--primary))",
+    },
 } satisfies ChartConfig
 
-export default function UniqueViews({ params, filter }: { params: { slug: string }, filter: DateRange | undefined }) {
+export default function UniqueViews({ params, filter, selectValue }: { params: { slug: string }, filter: DateRange | undefined, selectValue: string }) {
+    const { data, error, isLoading, mutate } = useSWR(`/unique/views/${params.slug}`, async () => await GetDailyPageViews(params.slug, filter));
+
+    const [dates, setDates] = useState<{ date: string, views: number }[]>([]);
+
+    useEffect(() => {
+        mutate();
+        AppendDates();
+    }, [filter]);
+
+    function FormatXTick(date: string) {
+        const fDate = new Date(date);
+        if (selectValue === "lastHour" || selectValue === "lastDay")
+            return fDate.toTimeString().split(" ")[0];
+        return fDate.toLocaleDateString('en-GB');
+    }
+
+    function AppendDates() {
+        if (!filter?.from) return;
+        console.log(selectValue);
+
+        const today = new Date();
+        const dateList = [];
+
+        if (selectValue === "lastHour") {
+            for (let i = 0; i < 60; i++) {
+                const date = new Date(today);
+                date.setMinutes(date.getMinutes() - i);
+                dateList.push({ date: date.toISOString(), views: 0 });
+            };
+        } else if (selectValue === "lastDay") {
+            for (let i = 0; i < 24; i++) {
+                const date = new Date(today);
+                date.setHours(today.getHours() - i);
+                dateList.push({ date: date.toISOString(), views: 0 });
+            };
+        } else {
+            const diff = differenceInDays(filter?.to || new Date(), filter?.from);
+
+            for (let i = 0; i < diff; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() - i);
+                dateList.push({ date: date.toISOString(), views: 0 });
+            };
+        }
+        setDates(dateList);
+    }
+
+    function joinArraysByDate(arr1) {
+        const combined = [...arr1, ...dates];
+        let result = [];
+
+        if (selectValue === "lastHour") {
+            result = combined.reduce((acc, item) => {
+                const dateTimeKey = new Date(item.date).toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
+
+                if (acc[dateTimeKey]) {
+                    acc[dateTimeKey].views = item.views;
+                } else {
+                    acc[dateTimeKey] = { date: item.date, views: item.views };
+                }
+                return acc;
+            }, {});
+
+        } else if (selectValue === "lastDay") {
+            result = combined.reduce((acc, item) => {
+                const dateTimeKey = new Date(item.date).toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
+
+                if (acc[dateTimeKey]) {
+                    acc[dateTimeKey].views = item.views;
+                } else {
+                    acc[dateTimeKey] = { date: item.date, views: item.views };
+                }
+                return acc;
+            }, {});
+        } else {
+            result = combined.reduce((acc, item) => {
+
+                if (acc[item.date]) {
+                    acc[item.date].views = item.views;
+                } else {
+                    acc[item.date] = { date: item.date, views: item.views };
+                }
+                return acc;
+            }, {});
+        }
+
+        return Object.values(result).reverse();
+    }
+
     return (
-        <Card className="rounded-3xl shadow">
+        <Card className="rounded-3xl shadow-sm">
             <CardHeader>
                 <CardTitle>Page Views</CardTitle>
             </CardHeader>
@@ -51,7 +119,7 @@ export default function UniqueViews({ params, filter }: { params: { slug: string
                 <ChartContainer className="min-h-[200px] w-full max-h-[300px]" config={chartConfig}>
                     <AreaChart
                         accessibilityLayer
-                        data={visitors}
+                        data={joinArraysByDate(data || [])}
                         margin={{
                             top: 20,
                             left: 12,
@@ -64,25 +132,20 @@ export default function UniqueViews({ params, filter }: { params: { slug: string
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
+                            tickFormatter={FormatXTick}
                         />
                         <ChartTooltip
-                            cursor={false}
                             content={<ChartTooltipContent
-                                labelKey="Page views "
-                                hideIndicator={true}
-                                className="p-2"
-                                nameKey="Page views "
+                                labelKey="views "
+                                nameKey="Views "
                                 indicator="line" />
                             }
                         />
                         <Area
                             dataKey="views"
-                            type="natural"
+                            type="linear"
                             fill="hsl(var(--primary))"
                             stroke="hsl(var(--primary))"
-                            dot={{
-                                fill: "var(--primary)",
-                            }}
                             activeDot={{
                                 r: 6,
                             }}

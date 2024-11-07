@@ -1,1 +1,0 @@
-ALTER TABLE "site" ADD COLUMN "token" text NOT NULL;

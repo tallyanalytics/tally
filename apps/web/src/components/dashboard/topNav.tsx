@@ -8,7 +8,6 @@ import ActiveVisitors from "./countActiveVisitors";
 export default function TopNav({ slug, }: { slug: string }) {
     const { data, error, isLoading } = useSWR(`/site/${slug}`, async () => await GetSite(slug));
 
-    // const session = useSession();
     return (
         <div className="w-100 flex justify-between">
             <div>

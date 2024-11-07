@@ -1,7 +1,8 @@
 "use server"
 
+import { DateRange } from "react-day-picker";
 import { auth } from "../../../auth";
-import { InternalCountActiveVisitors, InternalCreateSite, InternalGetSite, InternalGetSites } from '../../db/queries';
+import { InternalCountActiveVisitors, InternalCreateSite, InternalDailyPageViews, InternalGetSite, InternalGetSites } from '../../db/queries';
 
 export async function CreateSite(params: { name: string, domain: string }) {
     const session = await auth();
@@ -44,3 +45,18 @@ export async function CountActiveVisitors(siteId: string) {
 
     return await InternalCountActiveVisitors(userId, siteId)
 }
+
+export async function GetDailyPageViews(siteId: string, filter: DateRange | undefined) {
+    const session = await auth();
+
+    if (!session)
+        throw (401)
+
+    if (!filter)
+        throw (400)
+
+    const userId = session?.user?.id ?? ""
+
+    return await InternalDailyPageViews(userId, siteId, filter)
+}
+

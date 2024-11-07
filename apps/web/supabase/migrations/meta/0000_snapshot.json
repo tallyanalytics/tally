@@ -1,5 +1,5 @@
 {
-  "id": "47521758-27fd-43c1-9585-070e8bb994d4",
+  "id": "6381e89b-9107-4aaa-b2f6-4964196e6f4d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -230,7 +230,7 @@
           "name": "sessionId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
@@ -267,7 +267,7 @@
           "name": "userId",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "permission": {
           "name": "permission",
@@ -353,7 +353,7 @@
           "name": "userId",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -371,8 +371,13 @@
           "name": "salt",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'4946174754819844425cd102c1d7742696d62bd9671f5feb03579c84230a50d21a3ad9a89b7c0fcafcc438049528c45f3641a4dd3e2e0a98a9d295eef1b5d20a85379e899a3a42a066ba41ea7f6a4f3109ba1a48dfd58e6d75b1ef98a2dc1ee85ad9b333dc41ed1f52f5910a1968348d91af481b0a8ed5b44c71f2735073a73769ad5e676ba5cab63aebf8f3722242aaf270c0bea58b179f0764129435db568f271088a5ef1f436a218dc23022bfa6b37528aecf82243f736b554e41cffedcdefb070486a9e94c1e47c0b6087ba76bd0cfc26bc2433e968bdf066a330bd12818e5e00c0c789c7f1bdc7e00bdd889a1482f4f3b3e903fe1dfac40c351302f1c18'"
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -409,7 +414,7 @@
           "name": "visitorId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "siteId": {
           "name": "siteId",
@@ -417,12 +422,12 @@
           "primaryKey": false,
           "notNull": false
         },
-        "pageViews": {
-          "name": "pageViews",
-          "type": "jsonb[]",
+        "startedAt": {
+          "name": "startedAt",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'{}'::jsonb[]"
+          "notNull": true,
+          "default": "now()"
         },
         "updatedAt": {
           "name": "updatedAt",
@@ -430,6 +435,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "duration": {
+          "name": "duration",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
         }
       },
       "indexes": {},
@@ -559,11 +571,11 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "userId": {
-          "name": "userId",
+        "hashId": {
+          "name": "hashId",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "country": {
           "name": "country",
@@ -599,21 +611,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "visitor_userId_user_id_fk": {
-          "name": "visitor_userId_user_id_fk",
-          "tableFrom": "visitor",
-          "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     }

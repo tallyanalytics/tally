@@ -26,7 +26,7 @@ import { GetEventCount } from "../../app/actions/page";
 import { GetSites } from "../../app/actions/site";
 
 function Menu() {
-    const { data, error, isLoading } = useSWR(`/site`, async () => await GetSites());
+    const { data, error, isLoading } = useSWR("/sites", async () => await GetSites());
     const pathname = usePathname();
     const session = useSession();
     if (isLoading) return

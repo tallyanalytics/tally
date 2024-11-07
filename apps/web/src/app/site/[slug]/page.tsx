@@ -17,8 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/select";
-import { format } from "date-fns";
-import { SessionProvider } from 'next-auth/react';
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import Overview from "../../../components/dashboard/overview";
@@ -34,6 +32,7 @@ export default function Page({ params }: { params: { slug: string } }): JSX.Elem
   const [dateFilter, setDateFilter] = useState<DateRange | undefined>({
     from: subtractFromCurrentDate({ hours: 1 }),
   })
+  const [selectValue, setSelectValue] = useState("lastHour");
 
   function subtractFromCurrentDate({ hours = 0, days = 0, months = 0, years = 0 }) {
     const currentDate = new Date();
@@ -80,16 +79,14 @@ export default function Page({ params }: { params: { slug: string } }): JSX.Elem
         newDate = new Date(); // Default to the current date if no match
     }
 
-    console.log(newDate);
+    setSelectValue(value);
     setDateFilter({ from: newDate, to: undefined })
   }
 
   return (
     <main className="w-full grid grid-cols-2 gap-6">
       <div className="col-span-2 w-100">
-        <SessionProvider>
-          <TopNav slug={params.slug} />
-        </SessionProvider>
+        <TopNav slug={params.slug} />
       </div>
       <div className="col-span-2">
         <Select onValueChange={selectOnChange} defaultValue="lastHour">
@@ -148,7 +145,7 @@ export default function Page({ params }: { params: { slug: string } }): JSX.Elem
         <Overview params={params} filter={dateFilter} />
       </div>
       <div className="col-span-2">
-        <UniqueViews params={params} filter={dateFilter} />
+        <UniqueViews params={params} filter={dateFilter} selectValue={selectValue} />
       </div>
       <div className="col-span-2 lg:col-span-1">
         <Pages params={params} filter={dateFilter} />

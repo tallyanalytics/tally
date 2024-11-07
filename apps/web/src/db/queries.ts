@@ -1,6 +1,6 @@
 import "server-only";
 
-import { subMinutes } from 'date-fns';
+import { differenceInDays, differenceInMinutes, subMinutes } from 'date-fns';
 import { and, count, desc, eq, gt, gte, lt, lte, sql, sum, sumDistinct } from 'drizzle-orm';
 import { DateRange } from 'react-day-picker';
 import { db, pageView, site, siteSession, visitor } from "../db/schema";
@@ -275,4 +275,27 @@ export async function InternalGetVisitDuration(siteId: string, userId: string, f
 
         return { averageDuration };
     }
+}
+
+
+export async function InternalDailyPageViews(userId: string, siteId: string, filter: DateRange) {
+    if (!filter?.from) throw (400);
+
+    return await db
+        .select({
+            date: sql`DATE(${pageView.date})`.as('date'),
+            views: count(pageView.id).as('views')
+        })
+        .from(pageView)
+        .where(
+            filter.to ?
+                and(gte(pageView.date, filter.from), lte(pageView.date, filter.to))
+                : gte(pageView.date, filter.from)
+        )
+        .leftJoin(site, and(eq(site.id, siteId), eq(site.userId, userId)))
+        .groupBy(sql`DATE(${pageView.date})`)
+        .orderBy(sql`DATE(${pageView.date})`);
+
+
+
 }
