@@ -131,6 +131,7 @@ export const siteSession = pgTable(
         startedAt: timestamp("startedAt", { mode: "date" }).notNull().defaultNow(),
         updatedAt: timestamp("updatedAt", { mode: "date" }).notNull().defaultNow(),
         duration: integer("duration").notNull().default(0),
+        device: text("device").notNull(),
     },
 )
 

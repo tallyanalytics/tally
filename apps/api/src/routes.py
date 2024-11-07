@@ -6,6 +6,7 @@ from typing import Annotated
 import geocoder
 from fastapi import APIRouter, Header, Request, status
 from pydantic import BaseModel
+from user_agents import parse
 
 from .queries import (
     create_page_view,
@@ -51,7 +52,7 @@ class Event(BaseModel):
 
 
 @router.post("/t", status_code=status.HTTP_200_OK)
-def track_event(  # noqa: C901
+async def track_event(  # noqa: C901
     request: Request,
     event: Event,
     user_agent: Annotated[str | None, Header()] = None,
@@ -90,6 +91,8 @@ def track_event(  # noqa: C901
     else:
         update_visitor_last_visit(id)
 
+    device_type = get_device_type(user_agent)
+
     if event.type == Type.PAGE_EVENT:
         event_data = {
             "search": event.data.search,
@@ -101,15 +104,14 @@ def track_event(  # noqa: C901
         pass
     elif event.type == Type.CUSTOM_EVENT:
         pass
-
-    if not event_data:
+    else:
         return
 
     visitors = get_visitor_id(id)
     sessions = get_site_sessions_by_visitor(visitors[0]["id"])
 
     if not sessions or datetime.now() > datetime.fromisoformat(sessions[0]["updatedAt"]) + timedelta(minutes=10):
-        sessions = create_site_session(site[0]["id"], visitors[0]["id"])
+        sessions = create_site_session(site[0]["id"], visitors[0]["id"], device_type)
         create_page_view(sessions[0]["id"], event_data)
     else:
         update_session_updated_at(sessions[0]["id"])
@@ -122,3 +124,18 @@ def unique_hash(domain, ip, user_agent, salt):
     hash = hashlib.sha256(id.encode())
 
     return hash.hexdigest()
+
+
+def get_device_type(user_agent):
+    device = parse(user_agent)
+
+    if device.is_mobile:
+        device_type = "mobile"
+    elif device.is_tablet:
+        device_type = "tablet"
+    elif device.is_pc:
+        device_type = "desktop"
+    else:
+        device_type = "other"
+
+    return device_type

@@ -11,14 +11,14 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 # Insert into SiteSession table
-def create_site_session(site_id: str, visitor_id: str):
+def create_site_session(site_id: str, visitor_id: str, device: str):
     response = (
         supabase.table("siteSession")
         .insert(
             {
                 "siteId": site_id,
                 "visitorId": visitor_id,
-                # "pageViews": page_views,
+                "device": device,
                 "updatedAt": datetime.now().isoformat(),
             },
         )
